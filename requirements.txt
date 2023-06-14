@@ -1,0 +1,16 @@
+accelerate
+beartype
+einops>=0.6.1
+ema-pytorch>=0.2.2
+encodec
+fairseq
+joblib
+lion-pytorch
+local-attention>=1.8.4
+scikit-learn==0.24.0
+sentencepiece
+torch>=1.12
+torchaudio
+transformers
+tqdm
+vector-quantize-pytorch>=1.5.14
