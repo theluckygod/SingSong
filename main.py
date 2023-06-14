@@ -1,34 +1,22 @@
-import os
-import urllib.request
-from modules import SoundStream, HubertWithKmeans, FineTransformer, SemanticAcousticTransformer, SingSong
-from torch import nn
+from modules import SoundStream, HubertWithKmeans, CoarseTransformer, FineTransformer, SingSong
 import torch
 import torchaudio
 
 
 # define all dataset paths, checkpoints, etc
-soundstream_ckpt = "checkpoints/soundstream.8.pt" # this can change depending on number of steps
+# downloaded at https://huggingface.co/haydenshively/SoundStream/tree/main
+soundstream_ckpt = "checkpoints/soundstream/soundstream_variant_naturalspeech2.pt"
+
+# downloaded at https://github.com/facebookresearch/fairseq/tree/main/examples/hubert
 hubert_ckpt = "checkpoints/hubert/hubert_base_ls960.pt"
 hubert_quantizer = "checkpoints/hubert/hubert_base_ls960_L9_km500.bin" # listed in row "HuBERT Base (~95M params)", column Quantizer
 
 
 # Semantic codes
-# hubert checkpoints can be downloaded at
-# https://github.com/facebookresearch/fairseq/tree/main/examples/hubert
-if not os.path.isdir("hubert"):
-    os.makedirs("hubert")
-if not os.path.isfile(hubert_ckpt):
-    hubert_ckpt_download = f"https://dl.fbaipublicfiles.com/{hubert_ckpt}"
-    urllib.request.urlretrieve(hubert_ckpt_download, f"./{hubert_ckpt}")
-if not os.path.isfile(hubert_quantizer):
-    hubert_quantizer_download = f"https://dl.fbaipublicfiles.com/{hubert_quantizer}"
-    urllib.request.urlretrieve(hubert_quantizer_download, f"./{hubert_quantizer}")
-
 wav2vec = HubertWithKmeans(
     checkpoint_path = f"./{hubert_ckpt}",
     kmeans_path = f"./{hubert_quantizer}"
 )
-
 
 # Acoustic codes
 soundstream = SoundStream(
@@ -37,9 +25,11 @@ soundstream = SoundStream(
 )
 
 # Stage 1 + 2: Semantic-Acoustic Transformer
-semantic_acoustic_transformer = SemanticAcousticTransformer(
+semantic_acoustic_transformer = CoarseTransformer(
     num_semantic_tokens = wav2vec.codebook_size,
-    dim = 1024,
+    codebook_size = 1024,
+    num_coarse_quantizers = 3,
+    dim = 512,
     depth = 6
 )
 

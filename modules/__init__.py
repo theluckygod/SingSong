@@ -18,3 +18,5 @@ from modules.hubert_kmeans import HubertWithKmeans
 from modules.trainer import SoundStreamTrainer, SemanticTransformerTrainer, FineTransformerTrainer, CoarseTransformerTrainer
 
 from modules.audiolm_pytorch import get_embeds
+
+from modules.singsong import SingSong
